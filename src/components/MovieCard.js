@@ -21,7 +21,11 @@ export default function MovieCard({ movie, onPress }) {
   return (
     <TouchableOpacity style={s.movieCard} onPress={onPress} activeOpacity={0.9}>
       {movie.image ? (
-        <Image source={{ uri: movie.image }} style={s.movieImage} />
+        (typeof movie.image === 'string') ? (
+          <Image source={{ uri: movie.image }} style={s.movieImage} />
+        ) : (
+          <Image source={movie.image} style={s.movieImage} />
+        )
       ) : (
         <View style={[s.movieImage, { alignItems: 'center', justifyContent: 'center' }]}>
           <Feather name="film" size={28} color={theme.colors.gray} />

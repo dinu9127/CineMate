@@ -33,40 +33,45 @@ export default function FavoritesScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={[styles.title, { color: theme.colors.text }]}>Favorites</Text>
       </View>
+
       <FlatList
         data={favs}
         keyExtractor={i => String(i.id)}
-        contentContainerStyle={{ padding: 16, paddingTop: 8 }}
+        contentContainerStyle={{ padding: 16, paddingTop: 8, paddingBottom: 40 }}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         renderItem={({ item }) => (
-          <View>
-            <View style={styles.favCard}>
-              <View style={styles.favAccent} />
-              {item.image ? (
+          <View style={styles.favCard}>
+            <View style={styles.favAccent} />
+            {item.image ? (
+              (typeof item.image === 'string') ? (
                 <Image source={{ uri: item.image }} style={styles.favImage} />
               ) : (
-                <View style={[styles.favImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eee' }]}>
-                  <Feather name="film" size={22} color={theme.colors.gray} />
-                </View>
-              )}
-              <View style={styles.favContent}>
-                <Text style={styles.favTitle} numberOfLines={1}>{item.title}</Text>
-                <Text style={styles.favMeta} numberOfLines={1}>{(item.owner || '') + (item.rating ? ` • ⭐ ${item.rating}` : '') + (item.timeText ? ` • ${item.timeText}` : '')}</Text>
-                {item.description ? <Text style={styles.favDesc} numberOfLines={1}>{item.description}</Text> : null}
+                <Image source={item.image} style={styles.favImage} />
+              )
+            ) : (
+              <View style={[styles.favImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eee' }]}>
+                <Feather name="film" size={22} color={theme.colors.gray} />
+              </View>
+            )}
 
-                <View style={styles.favActions}>
-                  <TouchableOpacity
-                    style={[styles.favActionBtn, { backgroundColor: theme.colors.card }]}
-                    onPress={() => navigation.navigate('Home', { screen: 'MovieDetail', params: { id: item.id, title: item.title } })}
-                  >
-                    <Text style={[styles.favActionText, { color: theme.colors.primary }]}>See Details</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.favActionBtn, { backgroundColor: theme.colors.card }]}
-                    onPress={() => dispatch(removeFavorite(item.id))}
-                  >
-                    <Text style={[styles.favActionText, { color: theme.colors.secondary }]}>Remove</Text>
-                  </TouchableOpacity>
-                </View>
+            <View style={styles.favContent}>
+              <Text style={styles.favTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={styles.favMeta} numberOfLines={1}>{(item.owner || '') + (item.rating ? ` • ⭐ ${item.rating}` : '') + (item.timeText ? ` • ${item.timeText}` : '')}</Text>
+              {item.description ? <Text style={styles.favDesc} numberOfLines={2}>{item.description}</Text> : null}
+
+              <View style={styles.favActions}>
+                <TouchableOpacity
+                  style={[styles.favActionBtn, { backgroundColor: theme.colors.card }]}
+                  onPress={() => navigation.navigate('Home', { screen: 'MovieDetail', params: { id: item.id, title: item.title } })}
+                >
+                  <Text style={[styles.favActionText, { color: theme.colors.primary }]}>See Details</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.favActionBtn, { backgroundColor: theme.colors.card }]}
+                  onPress={() => dispatch(removeFavorite(item.id))}
+                >
+                  <Text style={[styles.favActionText, { color: theme.colors.secondary }]}>Remove</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

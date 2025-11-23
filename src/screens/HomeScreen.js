@@ -18,6 +18,13 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => { dispatch(fetchMovies()); }, [dispatch]);
 
+  // Debug: log items to help verify fallback mapping is applied
+  useEffect(() => {
+    if (items && items.length > 0) {
+      console.warn('Movies loaded (first 5):', items.slice(0, 5).map(m => ({ id: m.id, title: m.title, description: m.description }))); 
+    }
+  }, [items]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items;
@@ -35,8 +42,12 @@ export default function HomeScreen({ navigation }) {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} />
-            ) : (
+                (typeof user.avatar === 'string') ? (
+                  <Image source={{ uri: user.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                ) : (
+                  <Image source={user.avatar} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                )
+              ) : (
               <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: theme.colors.card, alignItems: 'center', justifyContent: 'center' }}>
                 <Feather name="user" size={18} color={theme.colors.gray} />
               </View>

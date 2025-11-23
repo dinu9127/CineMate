@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Button, Linking } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { ThemeContext } from '../context/ThemeContext';
 import { TMDB_API_KEY } from '../config';
@@ -9,9 +11,17 @@ export default function MovieDetailScreen({ route, navigation }) {
   const [movie, setMovie] = useState(null);
   const [trailer, setTrailer] = useState(null);
   const { theme } = useContext(ThemeContext);
+  const movies = useSelector(s => s.movies.items || []);
 
   useEffect(() => {
     if (title) navigation.setOptions({ title });
+    // prefer using the already-fetched movie from Redux store when available
+    const existing = movies.find(m => String(m.id) === String(id) || (m.title && title && m.title.toLowerCase() === title.toLowerCase()));
+    if (existing) {
+      setMovie(existing);
+      return;
+    }
+
     async function load() {
       try {
         if (TMDB_API_KEY && TMDB_API_KEY !== 'YOUR_TMDB_API_KEY_HERE') {
@@ -48,7 +58,11 @@ export default function MovieDetailScreen({ route, navigation }) {
   return (
     <ScrollView style={{ backgroundColor: theme.colors.background }} contentContainerStyle={{ padding: 16 }}>
       {movie.image ? (
-        <Image source={{ uri: movie.image }} style={styles.image} />
+        (typeof movie.image === 'string') ? (
+          <Image source={{ uri: movie.image }} style={styles.image} />
+        ) : (
+          <Image source={movie.image} style={styles.image} />
+        )
       ) : (
         <View style={[styles.image, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eee' }]}>
           <Feather name="film" size={48} color={theme.colors.gray} />
@@ -63,6 +77,30 @@ export default function MovieDetailScreen({ route, navigation }) {
         // open trailer URL in external browser
         try { Linking.openURL(trailer); } catch (e) { console.warn(e); }
       }} /> : null}
+
+      <View style={{ height: 12 }} />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Button title="Previous" onPress={() => {
+            // find current index and go to previous
+            const idx = movies.findIndex(m => String(m.id) === String(movie.id));
+            if (idx > 0) {
+              const prev = movies[idx - 1];
+              navigation.replace('MovieDetail', { id: prev.id, title: prev.title });
+            }
+          }} disabled={movies.length === 0 || movies.findIndex(m => String(m.id) === String(movie.id)) <= 0} />
+        </View>
+        <View style={{ flex: 1, marginLeft: 8 }}>
+          <Button title="Next" onPress={() => {
+            const idx = movies.findIndex(m => String(m.id) === String(movie.id));
+            if (idx >= 0 && idx < movies.length - 1) {
+              const next = movies[idx + 1];
+              navigation.replace('MovieDetail', { id: next.id, title: next.title });
+            }
+          }} disabled={movies.length === 0 || movies.findIndex(m => String(m.id) === String(movie.id)) === movies.length - 1} />
+        </View>
+      </View>
+
       <View style={{ height: 16 }} />
       <Button title="Select Seats" onPress={() => navigation.navigate('SeatSelection', { movieId: movie.id, movieTitle: movie.title })} />
     </ScrollView>
