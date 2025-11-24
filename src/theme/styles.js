@@ -6,7 +6,7 @@ export default function makeStyles(theme) {
     container: { flex: 1, backgroundColor: theme.colors.background },
     authWrapper: { flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    card: { borderRadius: 12, padding: 20, backgroundColor: theme.colors.card, elevation: 3, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, alignItems: 'center', marginHorizontal: 12 },
+    card: { borderRadius: 12, padding: 20, backgroundColor: theme.colors.card, borderWidth: 1, borderColor: theme.colors.border, elevation: 3, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, alignItems: 'center', marginHorizontal: 12 },
 
     // Typography
     title: { fontSize: 20, fontWeight: '700', color: theme.colors.text },
@@ -14,13 +14,16 @@ export default function makeStyles(theme) {
     sectionTitle: { fontSize: 16, fontWeight: '700', color: theme.colors.text },
 
     // Inputs & buttons
-    input: { width: '100%', borderRadius: 10, padding: 12, marginBottom: 12, backgroundColor: theme.colors.background, color: theme.colors.text },
+    input: { width: '100%', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 0, height: 48, marginBottom: 12, backgroundColor: theme.colors.background, color: theme.colors.text },
+    inputWrapper: { width: '100%', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 0, height: 48, marginBottom: 12, backgroundColor: 'transparent', borderWidth: 0, borderColor: theme.colors.border, maxWidth: 420, alignSelf: 'center', justifyContent: 'center' },
     search: { marginTop: 12 },
     searchRow: { width: '100%', flexDirection: 'row', alignItems: 'center', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12, marginTop: 8 },
-    inputRow: { width: '100%', flexDirection: 'row', alignItems: 'center', borderRadius: 10, paddingHorizontal: 8, marginBottom: 12, backgroundColor: theme.colors.background },
-    inputInner: { flex: 1, paddingVertical: 10, color: theme.colors.text },
+    searchBar: { width: '100%', flexDirection: 'row', alignItems: 'center', borderRadius: 15, paddingHorizontal: 10, paddingVertical: 2, marginBottom: 12, marginTop: 8, borderWidth: 1, borderColor: theme.colors.border, backgroundColor: theme.colors.card, marginHorizontal: 5 },
+    inputRow: { width: '100%', flexDirection: 'row', alignItems: 'center', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 0, height: 48, marginBottom: 12, backgroundColor: 'transparent', maxWidth: 420, alignSelf: 'center', justifyContent: 'center' },
+    inputInner: { flex: 1, paddingVertical: 0, height: 48, color: theme.colors.text, textAlignVertical: 'center', backgroundColor: 'transparent' },
     eyeButton: { padding: 8 },
     primaryButton: { width: '100%', padding: 12, alignItems: 'center', borderRadius: 8, backgroundColor: theme.colors.primary },
+    primaryButtonDisabled: { width: '100%', padding: 12, alignItems: 'center', borderRadius: 8, backgroundColor: theme.colors.muted || '#999', opacity: 0.85 },
     primaryButtonText: { color: '#fff', fontWeight: '600' },
     linkButton: { marginTop: 10 },
 
@@ -34,7 +37,7 @@ export default function makeStyles(theme) {
     statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, marginLeft: 8 },
     statusText: { fontSize: 11, fontWeight: '700' },
     row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    iconButton: { padding: 6, borderRadius: 20, minWidth: 36, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+    iconButton: { padding: 6, alignItems: 'center', justifyContent: 'center' },
 
     // Avatar / profile
     avatar: { width: 80, height: 80, borderRadius: 12, backgroundColor: '#eee' },

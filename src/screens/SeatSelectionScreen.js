@@ -1,6 +1,6 @@
 
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addBooking } from '../store/slices/bookingsSlice';
 import { ThemeContext } from '../context/ThemeContext';
@@ -14,6 +14,8 @@ export default function SeatSelectionScreen({ route, navigation }) {
   const [selected, setSelected] = useState([]);
   const bookings = useSelector(s => s.bookings.items || []);
   const user = useSelector(s => s.user.user);
+  const movies = useSelector(s => s.movies.items || []);
+  const movie = movies.find(m => String(m.id) === String(movieId));
 
   // compute seats already booked for this movie
   const bookedSeatsByOthers = new Set();
@@ -30,8 +32,14 @@ export default function SeatSelectionScreen({ route, navigation }) {
   function toggleSeat(r, c) {
     const key = `${r}-${c}`;
     // prevent selecting a seat already booked
-    if (bookedSeatsByOthers.has(key)) return;
-    if (bookedSeatsByUser.has(key)) return; // already booked by current user; cannot reselect
+    if (bookedSeatsByOthers.has(key)) {
+      Alert.alert('Seat unavailable', 'This seat is already booked');
+      return;
+    }
+    if (bookedSeatsByUser.has(key)) {
+      Alert.alert('Already booked', 'You have already booked this seat');
+      return; // already booked by current user; cannot reselect
+    }
     setSelected(prev => (prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key]));
   }
 
@@ -44,7 +52,17 @@ export default function SeatSelectionScreen({ route, navigation }) {
     }
     // create a simple id
     const id = Date.now().toString();
-    const booking = { id, movieId, movieTitle, seats: selected, date: new Date().toISOString(), user: user?.email || 'guest' };
+    const booking = {
+      id,
+      movieId,
+      movieTitle,
+      seats: selected,
+      date: new Date().toISOString(),
+      user: user?.email || 'guest',
+      // include movie image and scheduled show if available for richer booking UI
+      movieImage: movie && movie.image ? movie.image : null,
+      showDate: movie && (movie.showDate || movie.timeText) ? (movie.showDate || movie.timeText) : null,
+    };
     dispatch(addBooking(booking));
     // attempt to persist to backend if configured (best-effort)
     saveBooking(booking).catch(() => {
@@ -67,7 +85,7 @@ export default function SeatSelectionScreen({ route, navigation }) {
               const bgColor = reservedByOther ? '#d1d1d6' : reservedByUser ? '#2ecc71' : on ? theme.colors.primary : theme.colors.card;
               const textColor = reservedByOther ? '#666' : reservedByUser ? '#fff' : on ? '#fff' : theme.colors.text;
               return (
-                <TouchableOpacity key={c} onPress={() => toggleSeat(r, c)} disabled={reservedByOther || reservedByUser} style={[styles.seat, { backgroundColor: bgColor }]}>
+                <TouchableOpacity key={c} onPress={() => toggleSeat(r, c)} style={[styles.seat, { backgroundColor: bgColor }]}> 
                   <Text style={{ color: textColor }}>{String.fromCharCode(65 + r)}{c+1}</Text>
                 </TouchableOpacity>
               );

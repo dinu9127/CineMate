@@ -28,6 +28,11 @@ export const fetchMovies = createAsyncThunk('movies/fetchMovies', async (_, thun
           const localByTitle = assetsMap[m.title && m.title.toLowerCase()];
           const image = posterUrl || localById || localByTitle || null;
 
+          const offset = Math.abs(m.id) % 3; // distribute shows across today/tomorrow/day-after
+          const showDateObj = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 19, 30);
+          const showDateIso = showDateObj.toISOString();
+          const isTodayFlag = offset === 0;
+
           return {
             id: m.id,
             title: m.title,
@@ -38,6 +43,8 @@ export const fetchMovies = createAsyncThunk('movies/fetchMovies', async (_, thun
             runtime, // minutes
             timeText,
             status,
+            showDate: showDateIso,
+            isToday: isTodayFlag,
           };
         } catch (e) {
           // fallback to basic mapping if details fail
@@ -106,6 +113,10 @@ export const fetchMovies = createAsyncThunk('movies/fetchMovies', async (_, thun
       const localById = assetsMap[p.id];
       const localByTitle = assetsMap[lower];
       const image = localByTitle || localById || p.thumbnail || (p.images && p.images[0]) || null;
+      const now = new Date();
+      const offset = idx % 3; // deterministic demo schedule
+      const showDateObj = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 19, 30);
+      const showDateIso = showDateObj.toISOString();
       return {
         id: p.id,
         title,
@@ -116,6 +127,8 @@ export const fetchMovies = createAsyncThunk('movies/fetchMovies', async (_, thun
         runtime: null,
         timeText: null,
         status: (p.rating && p.rating >= 4.5) ? 'Popular' : 'Active',
+        showDate: showDateIso,
+        isToday: offset === 0,
       };
     });
   } catch (e) {

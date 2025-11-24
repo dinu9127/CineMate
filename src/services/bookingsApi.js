@@ -1,4 +1,4 @@
-// Placeholder bookings API. Replace with your server endpoints when available.
+// Placeholder bookings API. Replace with server endpoints when available.
 import { TMDB_API_KEY } from '../config';
 
 const BACKEND_URL = '';

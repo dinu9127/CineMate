@@ -35,7 +35,7 @@ export default function MovieDetailScreen({ route, navigation }) {
             rating: p.vote_average,
             owner: (p.production_companies && p.production_companies[0] && p.production_companies[0].name) || null,
           });
-          // fetch videos for trailer if available
+          
           try {
             const vids = await axios.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${TMDB_API_KEY}`);
             const trailerObj = vids.data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
@@ -68,7 +68,7 @@ export default function MovieDetailScreen({ route, navigation }) {
           <Feather name="film" size={48} color={theme.colors.gray} />
         </View>
       )}
-      <Text style={[styles.title, { color: theme.colors.text }]}>{movie.title}</Text>
+      <Text style={[styles.title, styles.titleSpacing, { color: theme.colors.text }]}>{movie.title}</Text>
       {movie.owner ? <Text style={[styles.owner, { color: theme.colors.gray }]}>{movie.owner}</Text> : null}
       <Text style={[styles.rating, { color: theme.colors.text }]}>⭐ {movie.rating}</Text>
       <Text style={[styles.desc, { color: theme.colors.text }]}>{movie.description}</Text>
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
   image: { width: '100%', height: 300, resizeMode: 'cover', borderRadius: 8, marginBottom: 12 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 6 },
+  titleSpacing: { marginTop: 5 },
   owner: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
   rating: { fontSize: 16, marginBottom: 8 },
   desc: { fontSize: 14, lineHeight: 20 },

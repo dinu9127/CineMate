@@ -22,6 +22,7 @@ export default function ProfileScreen({ navigation, onSignOut }) {
   const user = useSelector(s => s.user.user);
   const allBookings = useSelector(s => s.bookings.items || []);
   const bookings = allBookings.filter(b => b.user === user?.email);
+  const movies = useSelector(s => s.movies.items || []);
   const [current, setCurrent] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -88,8 +89,8 @@ export default function ProfileScreen({ navigation, onSignOut }) {
     ]);
   }
 
-  return (
-    <SafeAreaView style={[styles.container, { paddingTop: 28 }]}> 
+  const renderHeader = () => (
+    <>
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
         <TouchableOpacity onPress={() => (navigation && navigation.canGoBack() ? navigation.goBack() : navigation && navigation.getParent && navigation.getParent().navigate('Home'))} style={{ marginRight: 12 }}>
           <Feather name="arrow-left" size={20} color={theme.colors.primary} />
@@ -97,7 +98,7 @@ export default function ProfileScreen({ navigation, onSignOut }) {
         <Text style={[styles.title, { color: theme.colors.text }]}>Profile</Text>
       </View>
 
-      <View style={{...styles.card, flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
+      <View style={{...styles.card, flexDirection: 'row', alignItems: 'center', marginTop: 20, padding: 12}}>
         <TouchableOpacity onPress={pickImage} style={{ position: 'relative' }}>
           <Image source={ user?.avatar ? { uri: user.avatar } : { uri: 'https://via.placeholder.com/80' } } style={styles.avatar} />
           {uploading ? (
@@ -114,22 +115,18 @@ export default function ProfileScreen({ navigation, onSignOut }) {
 
       <View style={{ padding: 16 }}>
         <Text style={styles.sectionTitle}>Your Bookings</Text>
-        {bookings.length === 0 ? (
-          <Text style={{ color: theme.colors.gray, marginTop: 8 }}>You have no bookings yet.</Text>
-        ) : (
-          <FlatList data={bookings} keyExtractor={b => b.id} renderItem={({ item }) => (
-            <View style={styles.bookingCard}> 
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontWeight: '600', color: theme.colors.text }}>{item.movieTitle}</Text>
-                <Text style={{ color: theme.colors.gray }}>Seats: {item.seats.join(', ')}</Text>
-                <Text style={{ color: theme.colors.gray, fontSize: 12 }}>Booked: {new Date(item.date).toLocaleString()}</Text>
-              </View>
-              <TouchableOpacity onPress={() => handleRemoveBooking(item.id)} style={styles.removeBtn}><Text style={{ color: theme.colors.primary }}>Cancel</Text></TouchableOpacity>
-            </View>
-          )} />
-        )}
       </View>
+  </>
+  );
 
+  const renderEmpty = () => (
+    <View style={{ paddingHorizontal: 16 }}>
+      <Text style={{ color: theme.colors.gray, marginTop: 8 }}>You have no bookings yet.</Text>
+    </View>
+  );
+
+  const renderFooter = () => (
+    <>
       <View style={{ padding: 16 }}>
         <Text style={styles.sectionTitle}>Change Password</Text>
         <View style={{...styles.inputRow, backgroundColor: theme.colors.card}}> 
@@ -145,12 +142,72 @@ export default function ProfileScreen({ navigation, onSignOut }) {
           <TouchableOpacity onPress={() => setShowConfirm(v => !v)} style={styles.eyeButton}><Feather name={showConfirm ? 'eye' : 'eye-off'} size={16} color={theme.colors.gray} /></TouchableOpacity>
         </View>
         <View style={{ height: 8 }} />
-        <Button title="Update Password" onPress={handleChangePassword} />
+        <TouchableOpacity onPress={handleChangePassword} style={[styles.primaryButton, { alignItems: 'center' }]}> 
+          <Text style={styles.primaryButtonText}>Update Password</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={{ padding: 16 }}>
-        <Button title="Sign Out" onPress={handleLogout} />
+        <TouchableOpacity onPress={handleLogout} style={[styles.primaryButton, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.secondary }]}> 
+          <Feather name="log-out" size={18} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.primaryButtonText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
+    </>
+  );
+
+  return (
+    <SafeAreaView style={[styles.container, { paddingTop: 28 }]}> 
+      <FlatList
+        data={bookings}
+        keyExtractor={b => b.id}
+        renderItem={({ item }) => {
+          // try to find movie details from store if booking doesn't include image/showDate
+          const movieFromStore = movies.find(m => String(m.id) === String(item.movieId));
+          const image = item.movieImage || (movieFromStore && movieFromStore.image) || null;
+          const rawShow = item.showDate || (movieFromStore && (movieFromStore.showDate || movieFromStore.timeText)) || null;
+          let showText = null;
+          if (rawShow) {
+            // if ISO-like date, parse and format; otherwise display as-is
+            const parsed = new Date(rawShow);
+            if (!isNaN(parsed.getTime())) {
+              const now = new Date();
+              const isToday = parsed.getFullYear() === now.getFullYear() && parsed.getMonth() === now.getMonth() && parsed.getDate() === now.getDate();
+              const timeStr = parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              showText = isToday ? `Today • ${timeStr}` : `${parsed.toLocaleDateString([], { month: 'short', day: 'numeric' })} • ${timeStr}`;
+            } else {
+              showText = String(rawShow);
+            }
+          }
+
+          return (
+            <View style={[styles.bookingCard, { backgroundColor: theme.colors.card }]}> 
+              {image ? (
+                (typeof image === 'string') ? (
+                  <Image source={{ uri: image }} style={{ width: 72, height: 100, borderRadius: 8, marginRight: 12 }} />
+                ) : (
+                  <Image source={image} style={{ width: 72, height: 100, borderRadius: 8, marginRight: 12 }} />
+                )
+              ) : (
+                <View style={{ width: 72, height: 100, borderRadius: 8, backgroundColor: '#eee', marginRight: 12, alignItems: 'center', justifyContent: 'center' }}>
+                  <Feather name="film" size={24} color={theme.colors.gray} />
+                </View>
+              )}
+              <View style={{ flex: 1 }}> 
+                <Text style={{ fontWeight: '600', color: theme.colors.text }}>{item.movieTitle}</Text>
+                {showText ? <Text style={{ color: theme.colors.gray, marginTop: 4 }}>{showText}</Text> : null}
+                <Text style={{ color: theme.colors.gray, marginTop: 6 }}>Seats: {item.seats.join(', ')}</Text>
+                <Text style={{ color: theme.colors.gray, fontSize: 12, marginTop: 6 }}>Booked: {new Date(item.date).toLocaleString()}</Text>
+              </View>
+              <TouchableOpacity onPress={() => handleRemoveBooking(item.id)} style={styles.removeBtn}><Text style={{ color: theme.colors.primary }}>Cancel</Text></TouchableOpacity>
+            </View>
+          );
+        }}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      />
     </SafeAreaView>
   );
 }

@@ -5,6 +5,7 @@ const light = {
     background: '#F2F4F7', // light gray
     text: '#0B1320', // dark text
     card: '#FFFFFF', // white
+    border: '#E6E9EE',
     gray: '#8E8E93',
   },
   fontSizes: {
@@ -21,6 +22,7 @@ const dark = {
     background: '#0B1220',
     text: '#FFFFFF',
     card: '#111217',
+    border: '#22262B',
     gray: '#9A9AA0',
   },
   fontSizes: {

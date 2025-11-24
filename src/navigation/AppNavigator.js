@@ -28,6 +28,7 @@ function HomeStackScreen() {
           title: 'Details',
           headerShown: true,
           headerStyle: { backgroundColor: theme.colors.card },
+          headerTitleStyle: { marginTop: 6 },
           headerTintColor: theme.colors.text,
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 8 }}>

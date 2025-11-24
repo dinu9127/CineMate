@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}> 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 30, paddingBottom: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ fontSize: 22, fontWeight: '800', color: theme.colors.primary }}>{user?.name ? `Hi, ${user.name}` : 'Hi'}</Text>
         </View>
@@ -59,7 +59,7 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
       {showSearch ? (
-        <View style={[styles.searchRow, { backgroundColor: theme.colors.card }]}> 
+        <View style={styles.searchBar}> 
           <Feather name="search" size={18} color={theme.colors.gray} style={{ marginRight: 8 }} />
           <TextInput
             placeholder="Search movies..."
@@ -75,14 +75,14 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       ) : (
-        <TouchableOpacity onPress={() => setShowSearch(true)} style={[styles.searchRow, { backgroundColor: 'transparent', paddingHorizontal: 8 }]}> 
+        <TouchableOpacity onPress={() => setShowSearch(true)} style={[styles.searchRow, { backgroundColor: 'transparent', paddingHorizontal: 8, marginHorizontal: 5 }]}> 
           <Feather name="search" size={18} color={theme.colors.gray} style={{ marginRight: 8 }} />
           <Text style={{ color: theme.colors.gray }}>Search</Text>
         </TouchableOpacity>
       )}
 
       <View style={{ paddingHorizontal: 16, paddingTop: 6 }}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.secondary }]}>Trending Movies...</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.secondary }]}>Trending Movies</Text>
       </View>
 
       <FlatList data={filtered} keyExtractor={item => String(item.id)} contentContainerStyle={{ padding: 16 }} renderItem={({ item }) => (
